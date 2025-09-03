@@ -12,6 +12,7 @@ type Result struct {
 	value int
 }
 
+// Задание - вывести квадраты чисел,используя горутины.
 func getSquaresBase(arr []int) {
 	ch := make(chan int)
 	for _, val := range arr {
@@ -23,7 +24,7 @@ func calcSquaresBase(ch chan int, val int) {
 	ch <- val * val
 }
 
-//Усложненные варианты
+//Усложненные варианты - вывод массива,где квадраты чисел имеют тот же индекс,что и исходные числа
 /*
 Вариант с указателем
 */
