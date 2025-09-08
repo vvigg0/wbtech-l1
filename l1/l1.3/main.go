@@ -1,13 +1,14 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"sync"
 	"time"
 )
 
-func startWorkers(ch chan int, n int, wg *sync.WaitGroup) { // n - количество воркеров
-	for i := 0; i < n; i++ {
+func startWorkers(ch chan int, n *int, wg *sync.WaitGroup) { // n - количество воркеров
+	for i := 0; i < *n; i++ {
 		wg.Add(1)
 		go worker(ch, i, wg)
 	}
@@ -20,10 +21,12 @@ func worker(ch chan int, id int, wg *sync.WaitGroup) {
 }
 
 func main() {
-	n := 10 // ИЗМЕНЕНИЕ КОЛ-ВА ВОРКЕРОВ
+	workers := flag.Int("workers", 4, "количество воркеров")
+	flag.Parse()
+	//n := 10 // ИЗМЕНЕНИЕ КОЛ-ВА ВОРКЕРОВ
 	var wg sync.WaitGroup
 	ch := make(chan int)
-	startWorkers(ch, n, &wg)
+	startWorkers(ch, workers, &wg)
 	// постоянная запись в канал
 	go func() {
 		i := 0
