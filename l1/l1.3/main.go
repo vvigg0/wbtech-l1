@@ -23,7 +23,6 @@ func worker(ch chan int, id int, wg *sync.WaitGroup) {
 func main() {
 	workers := flag.Int("workers", 4, "количество воркеров")
 	flag.Parse()
-	//n := 10 // ИЗМЕНЕНИЕ КОЛ-ВА ВОРКЕРОВ
 	var wg sync.WaitGroup
 	ch := make(chan int)
 	startWorkers(ch, workers, &wg)
