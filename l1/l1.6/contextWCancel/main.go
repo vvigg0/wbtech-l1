@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"time"
 )
 
 func main() {
@@ -14,27 +15,42 @@ func main() {
 	// продюсер
 	go func() {
 		defer close(ch)
-		for i := 0; i < 6; i++ {
+		i := 0
+		t := time.NewTicker(500 * time.Millisecond)
+		defer t.Stop()
+		for {
 			select {
 			case <-ctx.Done():
+				fmt.Println("продюсер: отмена контекста -> выхожу")
 				return
-			case ch <- i:
+			case <-t.C:
+				ch <- i
+				i++
 			}
 		}
 	}()
 
-	// консюмер
+	// консюмер (когда увидит 3 - отменит контекст)
 	for {
 		select {
-		case <-ctx.Done():
-			fmt.Println("Отмена контекста, завершаем...")
-			return
 		case v, ok := <-ch:
 			if !ok {
-				fmt.Println("Канал закрыт")
+				fmt.Println("консюмер: канал закрыт -> выхожу")
 				return
 			}
-			fmt.Println("Получили:", v)
+			fmt.Println("консюмер: получили", v)
+			if v == 3 {
+				fmt.Println("консюмер: делаю отмену контекста")
+				cancel()
+			}
+		case <-ctx.Done():
+			for v := range ch {
+				fmt.Println("консюмер: остатки - Получил", v)
+			}
+			fmt.Println("консюмер: контекст отменен -> выхожу")
+			return
 		}
+
 	}
+	fmt.Println("Готово")
 }
